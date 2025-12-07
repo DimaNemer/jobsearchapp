@@ -1,21 +1,37 @@
-import { connectDB } from "@/lib/mongodb";
-import User from "@/models/User";
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb.js";
+import User from "@/models/User.js";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   try {
     await connectDB();
-    const { name, email, password, role } = await req.json();
 
-    const exists = await User.findOne({ email });
-    if (exists) return new Response(JSON.stringify({ error: "Email already exists" }), { status: 400 });
+    const { fullName, email, password, role } = await req.json();
 
+    // Check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return NextResponse.json(
+        { error: "Email already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Hash password
     const hashed = await bcrypt.hash(password, 10);
 
-    await User.create({ name, email, password: hashed, role });
+    // Create user
+    await User.create({
+      fullName,
+      email,
+      password: hashed,
+      role,
+    });
 
-    return new Response(JSON.stringify({ message: "User registered" }), { status: 201 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return NextResponse.json({ message: "Account created successfully" });
+  } catch (error) {
+    console.error("Signup route error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

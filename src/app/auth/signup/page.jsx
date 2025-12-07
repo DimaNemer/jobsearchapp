@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 
@@ -7,15 +8,41 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSignup() {
-    const res = await fetch("/api/signup", {
-      method: "POST",
-      body: JSON.stringify({ fullName, email, password, role }),
-    });
+    if (!fullName || !email || !password) {
+      alert("Please fill all the fields");
+      return;
+    }
 
-    const data = await res.json();
-    alert(data.message || data.error);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, email, password, role }),
+      });
+
+     let data;
+try {
+  data = await res.json();
+} catch (parseErr) {
+  data = { error: `Server returned non-JSON response (status ${res.status})` };
+}
+
+if (!res.ok) {
+  alert(data.error || "Something went wrong on the server");
+} else {
+  alert("Account created successfully!");
+  window.location.href = "/auth/login";
+}
+    } catch (err) {
+      alert("Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -29,7 +56,11 @@ export default function SignupPage() {
           <button
             onClick={() => setRole("candidate")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold 
-            ${role === "candidate" ? "border-pink-600 text-pink-600" : "border-gray-400"}`}
+            ${
+              role === "candidate"
+                ? "border-pink-600 text-pink-600"
+                : "border-gray-400"
+            }`}
           >
             Candidate
           </button>
@@ -37,7 +68,11 @@ export default function SignupPage() {
           <button
             onClick={() => setRole("employer")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold 
-            ${role === "employer" ? "border-pink-600 text-pink-600" : "border-gray-400"}`}
+            ${
+              role === "employer"
+                ? "border-pink-600 text-pink-600"
+                : "border-gray-400"
+            }`}
           >
             Employer
           </button>
@@ -79,9 +114,10 @@ export default function SignupPage() {
         {/* Signup Button */}
         <button
           onClick={handleSignup}
-          className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold text-lg mb-4"
+          disabled={loading}
+          className="w-full bg-blue-900 text-white py-3 rounded-xl font-semibold text-lg mb-4 disabled:opacity-50"
         >
-          Register
+          {loading ? "Registering..." : "Register"}
         </button>
 
         <p className="text-center text-sm">
