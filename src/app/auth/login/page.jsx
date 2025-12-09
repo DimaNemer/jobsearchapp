@@ -33,17 +33,25 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password, role }),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = { error: `Server returned status ${res.status}` };
+      }
 
       if (!res.ok) {
-        alert(data.error);
+        alert(data.error || "Login failed");
       } else {
-        alert("Login successful");
+        // Save a simple session so the user stays logged in
+        const session = { id: data.user.id, fullName: data.user.fullName, email: data.user.email };
+        localStorage.setItem("token", JSON.stringify(session));
 
-        // OPTIONAL: redirect to homepage
+        alert("Login successful");
         window.location.href = "/";
       }
     } catch (err) {
+      console.log(err);
       alert("Something went wrong. Try again.");
     } finally {
       setLoading(false);
@@ -55,16 +63,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 bg-white shadow-xl rounded-2xl">
         <h1 className="text-center text-3xl font-bold mb-6">User Login</h1>
 
-        {/* ROLE TOGGLE */}
         <div className="flex justify-center gap-4 mb-6">
           <button
             onClick={() => setRole("candidate")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold 
-            ${
-              role === "candidate"
-                ? "border-pink-600 text-pink-600"
-                : "border-gray-400"
-            }`}
+            ${role === "candidate" ? "border-pink-600 text-pink-600" : "border-gray-400"}`}
           >
             Candidate
           </button>
@@ -72,17 +75,12 @@ export default function LoginPage() {
           <button
             onClick={() => setRole("employer")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold 
-            ${
-              role === "employer"
-                ? "border-pink-600 text-pink-600"
-                : "border-gray-400"
-            }`}
+            ${role === "employer" ? "border-pink-600 text-pink-600" : "border-gray-400"}`}
           >
             Employer
           </button>
         </div>
 
-        {/* EMAIL */}
         <div className="relative mb-4">
           <input
             type="email"
@@ -93,7 +91,6 @@ export default function LoginPage() {
           <FaUser className="absolute top-3.5 left-3 text-pink-600 text-lg" />
         </div>
 
-        {/* PASSWORD */}
         <div className="relative mb-4">
           <input
             type={showPassword ? "text" : "password"}
@@ -102,7 +99,6 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {/* Show/hide password */}
           {showPassword ? (
             <FaEyeSlash
               onClick={() => setShowPassword(false)}
@@ -116,7 +112,6 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Remember + Forgot */}
         <div className="flex justify-between items-center mb-6 text-sm">
           <label className="flex items-center gap-2">
             <input type="checkbox" /> Remember me
@@ -126,7 +121,6 @@ export default function LoginPage() {
           </a>
         </div>
 
-        {/* LOGIN BUTTON */}
         <button
           onClick={handleLogin}
           disabled={loading}
@@ -135,7 +129,6 @@ export default function LoginPage() {
           {loading ? "Logging in..." : "Log In"}
         </button>
 
-        {/* REGISTER LINK */}
         <p className="text-center text-sm mb-6">
           Don’t have an account?{" "}
           <a href="/auth/signup" className="text-pink-600 font-semibold">
@@ -143,14 +136,12 @@ export default function LoginPage() {
           </a>
         </p>
 
-        {/* Social login separator */}
         <div className="flex items-center justify-center mb-4">
           <div className="w-1/3 border" />
           <span className="mx-2 text-gray-500">Or</span>
           <div className="w-1/3 border" />
         </div>
 
-        {/* SOCIAL BUTTONS */}
         <div className="flex justify-center gap-6">
           <button className="p-3 border rounded-lg hover:bg-gray-100">
             <FaLinkedinIn className="text-xl" />

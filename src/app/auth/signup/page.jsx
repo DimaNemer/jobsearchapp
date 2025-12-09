@@ -25,19 +25,25 @@ export default function SignupPage() {
         body: JSON.stringify({ fullName, email, password, role }),
       });
 
-     let data;
-try {
-  data = await res.json();
-} catch (parseErr) {
-  data = { error: `Server returned non-JSON response (status ${res.status})` };
-}
+      // Parse response safely
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = { error: `Server returned status ${res.status}` };
+      }
 
-if (!res.ok) {
-  alert(data.error || "Something went wrong on the server");
-} else {
-  alert("Account created successfully!");
-  window.location.href = "/auth/login";
-}
+      if (!res.ok) {
+        alert(data.error || "Signup failed");
+      } else {
+        // Save a simple session so user stays logged in (demo)
+        const session = { id: data.user.id, fullName: data.user.fullName, email: data.user.email };
+        localStorage.setItem("token", JSON.stringify(session));
+
+        alert("Account created successfully!");
+        // Redirect to jobs (freshly signed up users can now view everything)
+        window.location.href = "/jobs";
+      }
     } catch (err) {
       alert("Something went wrong. Try again.");
     } finally {
@@ -51,16 +57,11 @@ if (!res.ok) {
 
         <h1 className="text-center text-3xl font-bold mb-6">Create Account</h1>
 
-        {/* Toggle */}
         <div className="flex justify-center gap-4 mb-6">
           <button
             onClick={() => setRole("candidate")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold 
-            ${
-              role === "candidate"
-                ? "border-pink-600 text-pink-600"
-                : "border-gray-400"
-            }`}
+            ${role === "candidate" ? "border-pink-600 text-pink-600" : "border-gray-400"}`}
           >
             Candidate
           </button>
@@ -68,17 +69,12 @@ if (!res.ok) {
           <button
             onClick={() => setRole("employer")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold 
-            ${
-              role === "employer"
-                ? "border-pink-600 text-pink-600"
-                : "border-gray-400"
-            }`}
+            ${role === "employer" ? "border-pink-600 text-pink-600" : "border-gray-400"}`}
           >
             Employer
           </button>
         </div>
 
-        {/* Full Name */}
         <div className="relative mb-4">
           <input
             type="text"
@@ -89,7 +85,6 @@ if (!res.ok) {
           <FaUser className="absolute top-3.5 left-3 text-pink-600" />
         </div>
 
-        {/* Email */}
         <div className="relative mb-4">
           <input
             type="email"
@@ -100,7 +95,6 @@ if (!res.ok) {
           <FaEnvelope className="absolute top-3.5 left-3 text-pink-600" />
         </div>
 
-        {/* Password */}
         <div className="relative mb-4">
           <input
             type="password"
@@ -111,7 +105,6 @@ if (!res.ok) {
           <FaLock className="absolute top-3.5 left-3 text-pink-600" />
         </div>
 
-        {/* Signup Button */}
         <button
           onClick={handleSignup}
           disabled={loading}

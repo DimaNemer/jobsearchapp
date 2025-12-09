@@ -22,14 +22,23 @@ export async function POST(req) {
     const hashed = await bcrypt.hash(password, 10);
 
     // Create user
-    await User.create({
+    const newUser = await User.create({
       fullName,
       email,
       password: hashed,
       role,
     });
 
-    return NextResponse.json({ message: "Account created successfully" });
+    // Return created user (exclude password)
+    return NextResponse.json({
+      message: "Account created successfully",
+      user: {
+        id: newUser._id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        role: newUser.role,
+      },
+    });
   } catch (error) {
     console.error("Signup route error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

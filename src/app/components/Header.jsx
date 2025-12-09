@@ -3,9 +3,9 @@
 
 export default function Header() {
   return (
-    <header className="bg-[#05173B] text-white flex justify-between items-center px-10 py-4">
+    <header className="bg-[#05173B] text-white flex justify-between items-center px-12 py-8">
       <div className="logo">
-        {/* <Image src={logo} alt="Job Portal Logo" width={150} height={50} /> */}
+      <image  src="./image/mainlogo.png"></image>
       </div>
 
       <nav className="flex gap-8 text-lg">
