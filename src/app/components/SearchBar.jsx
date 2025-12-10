@@ -1,7 +1,7 @@
 export default function SearchBar() {
   return (
     <div
-      className="flex flex-col md:flex-row justify-center gap-4 px-10 py-6 -mt-20 relative z-10 rounded-md"
+      className="flex flex-col md:flex-row justify-center gap-4 px-10 py-6 rounded-md shadow-md"
       style={{
         backgroundImage: "url('/image/search-bar-bg.jpg')",
         backgroundSize: "cover",

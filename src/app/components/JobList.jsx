@@ -22,9 +22,9 @@ export default function JobList() {
       <h1 className="text-3xl font-bold mb-6 text-center">Latest Jobs</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {firstFiveJobs.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
+     {firstFiveJobs.map((job, idx) => (
+  <JobCard key={`${job.id}-${idx}`} job={job} />
+))}
       </div>
 
       <div className="text-center mt-10">
