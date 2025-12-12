@@ -1,13 +1,23 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb.js";
-import User from "@/models/User.js";
+import { connectDB } from "@/lib/mongodb";
+import User from "@/models/User";
+import Company from "@/models/Company";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export async function POST(req) {
   try {
     await connectDB();
 
-    const { fullName, email, password, role } = await req.json();
+    const { fullName, email, password, role, company } = await req.json();
+
+    // Basic validation
+    if (!fullName || !email || !password || !role) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -18,29 +28,77 @@ export async function POST(req) {
       );
     }
 
+    // Employer must have company
+    if (role === "employer" && !company?.name) {
+      return NextResponse.json(
+        { error: "Company information is required for employers" },
+        { status: 400 }
+      );
+    }
+
     // Hash password
-    const hashed = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
     const newUser = await User.create({
       fullName,
       email,
-      password: hashed,
+      password: hashedPassword,
       role,
     });
 
-    // Return created user (exclude password)
-    return NextResponse.json({
+    let createdCompany = null;
+
+    // Create company if employer
+    if (role === "employer") {
+      createdCompany = await Company.create({
+        name: company.name,
+        location: company.location,
+        website: company.website,
+        owner: newUser._id,
+      });
+
+      newUser.company = createdCompany._id;
+      await newUser.save();
+    }
+
+    // Create JWT
+    const token = jwt.sign(
+      { id: newUser._id, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // ✅ IMPORTANT PART: SET COOKIE
+    const response = NextResponse.json({
       message: "Account created successfully",
       user: {
-        id: newUser._id,
+        _id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,
         role: newUser.role,
+        company: createdCompany
+          ? {
+              _id: createdCompany._id,
+              name: createdCompany.name,
+            }
+          : null,
       },
     });
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    return response;
   } catch (error) {
-    console.error("Signup route error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Signup error:", error);
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500 }
+    );
   }
 }

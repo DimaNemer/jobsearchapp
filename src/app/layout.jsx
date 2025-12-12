@@ -1,5 +1,6 @@
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
+import ClientAuthProvider from "./components/ClientAuthProvider.jsx";
 import "./globals.css";
 
 export const metadata = {
@@ -11,9 +12,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-white">
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <ClientAuthProvider>
+          <Header />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </ClientAuthProvider>
       </body>
     </html>
   );

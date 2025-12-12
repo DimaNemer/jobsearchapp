@@ -19,27 +19,30 @@ export async function POST(req) {
   }
 
   const token = jwt.sign(
-    { id: user._id, email: user.email, role: user.role },
+    { id: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
 
   const response = NextResponse.json({
     message: "Login successful",
+    token,
     user: {
-      id: user._id,
+      _id: user._id,
       fullName: user.fullName,
       email: user.email,
       role: user.role,
     },
   });
 
-  response.cookies.set("token", token, {
-    httpOnly: true,
-    secure: true,
-    path: "/",
-    maxAge: 7 * 24 * 60 * 60,
-  });
+ response.cookies.set("token", token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60,
+});
+
 
   return response;
 }
+

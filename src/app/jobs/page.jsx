@@ -1,95 +1,33 @@
-// "use client";
+import Link from "next/link";
 
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import JobCard from "@/app/components/JobCard";
-// import SearchBar from "@/app/components/SearchBar";
+async function getJobs() {
+  const res = await fetch("http://localhost:3000/api/jobs", {
+    cache: "no-store",
+  });
+  const data = await res.json();
+  return data.jobs || [];
+}
 
-// export default function JobsPage() {
-//   const router = useRouter();
-//   const [jobs, setJobs] = useState([]);
-
-//   useEffect(() => {
-//     const token = localStorage.getItem("token");
-//     if (!token) {
-//       router.push("/auth/signup");
-//       return;
-//     }
-
-//     // ⬇ Fetch real jobs from API
-//     async function fetchJobs() {
-//       try {
-//         const res = await fetch("/api/jobs");
-//         const data = await res.json();
-//         setJobs(data);
-//       } catch (error) {
-//         console.error("Error loading jobs:", error);
-//       }
-//     }
-
-//     fetchJobs();
-//   }, [router]);
-
-//   return (
-//     <div className="px-6 py-10 bg-[#DDE6ED] min-h-screen">
-//       {/* 🟦 Title on Top */}
-//       <h1 className="text-3xl font-bold text-[#26374D] mb-8 text-center">
-//         All Jobs
-//       </h1>
-
-//       {/* 🔎 Search Bar BELOW the Title */}
-//       <div className="max-w-3xl mx-auto mb-12">
-//         <SearchBar />
-//       </div>
-
-//       {/* Job Grid */}
-//       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-//         {jobs.map((job) => (
-//           <JobCard key={job._id} job={job} />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import JobCard from "@/app/components/JobCard";
-import SearchBar from "@/app/components/SearchBar";
-
-export default function JobsPage() {
-  const router = useRouter();
-  const [jobs, setJobs] = useState([]);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) router.push("/auth/signup");
-
-    async function loadJobs() {
-      const res = await fetch("/api/jobs");
-      const data = await res.json();
-      setJobs(data);
-    }
-
-    loadJobs();
-  }, [router]);
+export default async function JobsPage() {
+  const jobs = await getJobs();
 
   return (
-    <div className="px-6 py-10 bg-[#DDE6ED] min-h-screen">
-      <h1 className="text-3xl font-bold text-[#26374D] mb-8 text-center">
-        All Jobs
-      </h1>
+    <div className="max-w-6xl mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-6">Available Jobs</h1>
 
-      <div className="max-w-3xl mx-auto mb-12">
-        <SearchBar />
-      </div>
-
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid gap-6">
         {jobs.map((job) => (
-          <JobCard key={job._id} job={job} />
+          <Link
+            key={job._id}
+            href={`/jobs/${job.slug}`}
+            className="border p-5 rounded hover:shadow"
+          >
+            <h2 className="text-xl font-semibold">{job.title}</h2>
+            <p className="text-gray-600">{job.company?.name}</p>
+            <p className="text-sm text-gray-500">
+              {job.location} • {job.employmentType}
+            </p>
+          </Link>
         ))}
       </div>
     </div>

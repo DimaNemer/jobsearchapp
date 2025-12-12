@@ -1,22 +1,42 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import jwt from "jsonwebtoken";
 
-export async function middleware(req) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-
+export function middleware(req) {
   const { pathname } = req.nextUrl;
 
-  // If user is NOT logged in and trying to access protected pages
- 
-
-  // If logged in, block access to login/register
-  if (token && pathname.startsWith("/auth")) {
-    return NextResponse.redirect(new URL("/", req.url));
+  // Public routes
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/jobs")
+  ) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  const token = req.cookies.get("token")?.value;
+
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (pathname.startsWith("/dashboard/employer") && decoded.role !== "employer") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    if (pathname.startsWith("/dashboard/candidate") && decoded.role !== "candidate") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    return NextResponse.next();
+  } catch (err) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  }
 }
 
 export const config = {
-  matcher: ["/jobs/:path*", "/details/:path*", "/auth/:path*"],
+  matcher: ["/dashboard/:path*"],
 };
