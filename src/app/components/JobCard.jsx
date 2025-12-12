@@ -10,14 +10,15 @@ export default function JobCard({ job, onBookmarkToggle }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
     try {
       const savedJobs = JSON.parse(localStorage.getItem("savedJobs") || "[]");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSaved(savedJobs.includes(job.id));
+      setSaved(savedJobs.includes(job._id || job.id)); // <— FIX: API uses _id
     } catch {
       setSaved(false);
     }
-  }, [job.id]);
+  }, [job._id, job.id]);
 
   const toggleSave = () => {
     const newSaved = !saved;
@@ -25,17 +26,18 @@ export default function JobCard({ job, onBookmarkToggle }) {
 
     try {
       let savedJobs = JSON.parse(localStorage.getItem("savedJobs") || "[]");
+      const jobId = job._id || job.id; // <— FIX: API uses Mongo _id
 
       if (newSaved) {
-        if (!savedJobs.includes(job.id)) savedJobs.push(job.id);
+        if (!savedJobs.includes(jobId)) savedJobs.push(jobId);
       } else {
-        savedJobs = savedJobs.filter((id) => id !== job.id);
+        savedJobs = savedJobs.filter((id) => id !== jobId);
       }
 
       localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
 
       if (typeof onBookmarkToggle === "function") {
-        onBookmarkToggle(job.id, newSaved);
+        onBookmarkToggle(jobId, newSaved);
       }
     } catch (err) {
       console.error("Failed to update savedJobs:", err);
@@ -45,14 +47,21 @@ export default function JobCard({ job, onBookmarkToggle }) {
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-5 border border-gray-100 w-full">
       <div className="flex items-center gap-4">
-        {/* Company Logo */}
+
+        {/* Company Logo (safe fallback) */}
         <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-          <Image src={job.image} alt={job.company} fill className="object-contain" />
+          <Image
+            src={job.image || "/image/default-logo.png"}   // <-- FIX: avoid crash if no image
+            alt={job.company || "Company"}
+            fill
+            className="object-contain"
+          />
         </div>
 
         {/* Right side */}
         <div className="flex-1">
-          {/* Title + Bookmark icon */}
+
+          {/* Title + Bookmark */}
           <div className="flex justify-between items-start">
             <h2 className="text-lg font-semibold">{job.title}</h2>
 
@@ -78,7 +87,7 @@ export default function JobCard({ job, onBookmarkToggle }) {
           </div>
 
           <button
-            onClick={() => router.push(`/jobs/${job.id}`)}
+            onClick={() => router.push(`/jobs/${job._id || job.id}`)} // <— FIX: dynamic API id
             className="mt-4 w-full max-w-[150px] bg-[#26374D] text-white py-1 rounded-lg font-medium hover:bg-[#536D82] transition"
           >
             View Job

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { jobs } from "../data/jobs";
+
 
 export default function HiringCompanies() {
   // Build unique companies from jobs (use fields that exist in src/app/data/jobs.js)
