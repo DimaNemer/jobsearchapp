@@ -4,10 +4,28 @@ const JobSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
 
-    company: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Company",
+    slug: {
+      type: String,
       required: true,
+      unique: true,
+    },
+
+    location: String,
+    employmentType: String,
+    experienceLevel: String,
+
+    categories: [String],
+    description: String,
+    responsibilities: [String],
+    requirements: [String],
+
+    salary: String,
+    logo: String,
+
+    status: {
+      type: String,
+      enum: ["active", "closed"],
+      default: "active",
     },
 
     employer: {
@@ -16,49 +34,27 @@ const JobSchema = new mongoose.Schema(
       required: true,
     },
 
-    logo: {
-      type: String, // image URL
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
       required: true,
-    },
-
-    location: { type: String, required: true },
-
-    employmentType: {
-      type: String,
-      enum: ["Full-time", "Part-time", "Contract", "Internship", "Remote"],
-      required: true,
-    },
-
-    experienceLevel: {
-      type: String,
-      enum: ["Junior", "Mid-level", "Senior", "Lead", "Any"],
-      default: "Any",
-    },
-    slug: {
-  type: String,
-  unique: true,
-  required: true,
-},
-
-
-    categories: [String], // free tags
-
-    description: { type: String, required: true },
-
-    responsibilities: [String],
-    requirements: [String],
-
-    salary: { type: String }, // optional, flexible
-
-    deadline: Date,
-
-    status: {
-      type: String,
-      enum: ["active", "draft"],
-      default: "active",
     },
   },
   { timestamps: true }
 );
+
+// 🔥 AUTO-GENERATE SLUG
+JobSchema.pre("validate", function () {
+  if (!this.slug && this.title) {
+    this.slug =
+      this.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") +
+      "-" +
+      Math.random().toString(36).substring(2, 7);
+  }
+});
+
 
 export default mongoose.models.Job || mongoose.model("Job", JobSchema);

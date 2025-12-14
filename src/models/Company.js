@@ -3,11 +3,9 @@ import mongoose from "mongoose";
 const CompanySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    logo: { type: String }, // image URL
-    website: String,
-    linkedin: String,
-    location: String,
-    email: String,
+    location: { type: String },
+    website: { type: String },
+    logo: { type: String }, // base64 or URL (for later)
 
     owner: {
       type: mongoose.Schema.Types.ObjectId,

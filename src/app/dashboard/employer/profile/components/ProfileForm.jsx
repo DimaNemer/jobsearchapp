@@ -98,11 +98,12 @@ export default function ProfileForm() {
       {/* Photo */}
       <div className="flex items-center gap-4 mb-6">
         {form.photo ? (
-          <image
-            src={form.photo}
-            className="w-24 h-24 rounded-full object-cover"
-            alt="profile"
-          />
+        <img
+  src={form.photo}
+  className="w-24 h-24 rounded-full object-cover"
+  alt="profile"
+/>
+
         ) : (
           <div className="w-24 h-24 bg-gray-200 rounded-full" />
         )}
