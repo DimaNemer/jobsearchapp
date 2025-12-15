@@ -1,9 +1,27 @@
 "use client";
 
-import { useMemo, useState } from "react";
+// import { useMemo, useState } from "react";
+
+// import { useEffect } from "react";
+// import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
+
 
 export default function PostJobPage() {
+    const searchParams = useSearchParams();
+  const router = useRouter();
+  const jobId = searchParams.get("id");
+ console.log("JOB ID FROM URL:", jobId);
+
+
+  const isEdit = Boolean(jobId);
+
   const [loading, setLoading] = useState(false);
+const [initialLoading, setInitialLoading] = useState(isEdit);
+
+
 
   const [form, setForm] = useState({
     title: "",
@@ -18,6 +36,8 @@ export default function PostJobPage() {
     logo: "", // base64 string
   });
 
+
+
   const logoPreview = useMemo(() => form.logo || "", [form.logo]);
 
   function setField(key, value) {
@@ -30,6 +50,92 @@ export default function PostJobPage() {
       .map((l) => l.trim())
       .filter(Boolean);
   }
+
+  useEffect(() => {
+  if (!isEdit) return;
+
+  async function loadJob() {
+    try {
+      if (!jobId || jobId.length !== 24) {
+  alert("Invalid job id in URL");
+  return;
+}
+      const res = await fetch(`/api/jobs/${jobId}`, {
+        credentials: "include",
+      });
+
+      const job = await res.json();
+
+      if (!res.ok) {
+        alert(job.error || "Failed to load job");
+        return;
+      }
+
+      setForm({
+        title: job.title || "",
+        location: job.location || "",
+        employmentType: job.employmentType || "Full-time",
+        experienceLevel: job.experienceLevel || "Any",
+        categories: (job.categories || []).join(", "),
+        salary: job.salary || "",
+        description: job.description || "",
+        responsibilitiesText: (job.responsibilities || []).join("\n"),
+        requirementsText: (job.requirements || []).join("\n"),
+        logo: job.logo || "",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Could not load job");
+    } finally {
+      setInitialLoading(false);
+    }
+  }
+
+  loadJob();
+}, [isEdit, jobId]);
+
+
+//   useEffect(() => {
+//   if (!isEdit) return;
+
+//   async function loadJob() {
+//     try {
+//       const res = await fetch(`/api/jobs/${jobId}`, {
+//         credentials: "include",
+//       });
+
+//       const data = await res.json();
+//       const job = data.job || data;
+
+//       if (!res.ok) {
+//         alert("Failed to load job");
+//         return;
+//       }
+
+//       setForm({
+//         title: job.title || "",
+//         location: job.location || "",
+//         employmentType: job.employmentType || "Full-time",
+//         experienceLevel: job.experienceLevel || "Any",
+//         categories: (job.categories || []).join(", "),
+//         salary: job.salary || "",
+//         description: job.description || "",
+//         responsibilitiesText: (job.responsibilities || []).join("\n"),
+//         requirementsText: (job.requirements || []).join("\n"),
+//         logo: job.logo || "",
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       alert("Could not load job");
+//     } finally {
+//       setInitialLoading(false);
+//     }
+//   }
+
+//   loadJob();
+// }, [isEdit, jobId]);
+
+
 
   async function handleLogoChange(e) {
     const file = e.target.files?.[0];
@@ -66,6 +172,7 @@ export default function PostJobPage() {
 
     try {
       const payload = {
+        id: jobId,
         title: form.title.trim(),
         location: form.location.trim(),
         employmentType: form.employmentType,
@@ -87,12 +194,15 @@ export default function PostJobPage() {
         logo: form.logo || null,
       };
 
-      const res = await fetch("/api/jobs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // IMPORTANT: send cookie token
-        body: JSON.stringify(payload),
-      });
+const res = await fetch(
+  isEdit ? `/api/jobs/${jobId}` : "/api/jobs",
+  {
+    method: isEdit ? "PUT" : "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  }
+);
 
       const data = await res.json().catch(() => ({}));
 
@@ -101,7 +211,9 @@ export default function PostJobPage() {
         return;
       }
 
-      alert("✅ Job posted successfully!");
+   alert(isEdit ? "Job updated successfully!" : "Job posted successfully!");
+router.push("/dashboard/employer/my-jobs");
+
 
       // Reset (keep selects)
       setForm((prev) => ({
@@ -122,6 +234,7 @@ export default function PostJobPage() {
       setLoading(false);
     }
   }
+if (initialLoading) return <p>Loading job...</p>;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -303,7 +416,14 @@ export default function PostJobPage() {
             disabled={loading}
             className="bg-blue-900 text-white px-6 py-3 rounded-lg disabled:opacity-50"
           >
-            {loading ? "Publishing..." : "Publish Job"}
+           {loading
+  ? isEdit
+    ? "Updating..."
+    : "Publishing..."
+  : isEdit
+  ? "Update Job"
+  : "Publish Job"}
+
           </button>
 
           <a

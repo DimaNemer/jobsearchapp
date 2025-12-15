@@ -27,6 +27,9 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
+    resetPasswordToken: String,
+resetPasswordExpires: Date,
+
     role: { type: String, enum: ["candidate", "employer"], required: true },
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -38,6 +41,23 @@ const UserSchema = new mongoose.Schema(
       ref: "Company",
       default: null,
     },
+profile: {
+  firstName: String,
+  lastName: String,
+  dob: String,
+  gender: String,
+  mobile: String,
+  phone: String,
+  country: String,
+  nationality: String,
+  position: String,
+  district: String,
+  address: String,
+  linkedin: String,
+  photo: String,
+},
+
+
   },
   { timestamps: true }
 );

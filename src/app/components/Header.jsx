@@ -37,7 +37,7 @@ const handleFindJob = () => {
         <Link href="/">Home</Link>
         <Link href="/jobs">Jobs</Link>
         <Link href="/hiring-company">Hiring Company</Link>
-        {me && <Link href="/profile">Profile</Link>}
+
 
         {/* ACTION BUTTONS */}
         <button

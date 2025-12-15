@@ -185,6 +185,8 @@ export default function MyJobsPage() {
 </a>
 
 
+
+
                 <button
                   onClick={() => deleteJob(job._id)}
                   className="px-4 py-2 bg-red-600 text-white rounded"

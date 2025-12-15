@@ -5,6 +5,7 @@ import User from "@/models/User";
 import jwt from "jsonwebtoken";
 import Company from "@/models/Company";
 
+
 export async function POST(req) {
   try {
     await connectDB();
@@ -91,6 +92,7 @@ export async function GET(req) {
     );
   }
 }
+
 
 
 

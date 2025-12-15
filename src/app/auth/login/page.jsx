@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -99,6 +101,9 @@ export default function LoginPage() {
             Register here
           </a>
         </p>
+        <a href="/auth/forgot-password" className="text-sm text-pink-600">
+  Forgot password?
+</a>
       </div>
     </div>
   );

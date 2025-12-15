@@ -7,6 +7,9 @@ import { FaUser, FaEnvelope, FaLock, FaBuilding } from "react-icons/fa";
 export default function SignupPage() {
   const searchParams = useSearchParams();
   const defaultRole = searchParams.get("role") || "candidate";
+const roleFromQuery = searchParams.get("role");
+const isRoleLocked = roleFromQuery === "employer" || roleFromQuery === "candidate";
+
 
   const [role, setRole] = useState(defaultRole);
   const [fullName, setFullName] = useState("");
@@ -88,7 +91,7 @@ export default function SignupPage() {
         <h1 className="text-center text-3xl font-bold mb-6">Create Account</h1>
 
         {/* ROLE SELECT */}
-        <div className="flex justify-center gap-4 mb-6">
+        {/* <div className="flex justify-center gap-4 mb-6">
           <button
             onClick={() => setRole("candidate")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold ${
@@ -98,9 +101,23 @@ export default function SignupPage() {
             }`}
           >
             Candidate
-          </button>
+          </button> */}
+          {/* ROLE SELECT */}
+{!isRoleLocked && (
+  <div className="flex justify-center gap-4 mb-6">
+    <button
+      onClick={() => setRole("candidate")}
+      className={`px-6 py-2 rounded-lg border-2 font-semibold ${
+        role === "candidate"
+          ? "border-pink-600 text-pink-600"
+          : "border-gray-400"
+      }`}
+    >
+      Candidate
+    </button>
+          
 
-          <button
+          {/* <button
             onClick={() => setRole("employer")}
             className={`px-6 py-2 rounded-lg border-2 font-semibold ${
               role === "employer"
@@ -110,7 +127,19 @@ export default function SignupPage() {
           >
             Employer
           </button>
-        </div>
+        </div> */}
+        <button
+      onClick={() => setRole("employer")}
+      className={`px-6 py-2 rounded-lg border-2 font-semibold ${
+        role === "employer"
+          ? "border-pink-600 text-pink-600"
+          : "border-gray-400"
+      }`}
+    >
+      Employer
+    </button>
+  </div>
+)}
 
         {/* COMMON FIELDS */}
         <div className="relative mb-4">
