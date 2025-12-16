@@ -206,9 +206,7 @@ export async function GET(req, { params }) {
   try {
     await connectDB();
 
-    const rawId = params?.id;
-    const id = Array.isArray(rawId) ? rawId[0] : rawId;
-
+    const {id} = await params;
     // ✅ ADD: try slug first (DO NOT REMOVE ANYTHING BELOW)
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
       const jobBySlug = await Job.findOne({ slug: id }).populate(
@@ -270,8 +268,8 @@ export async function PUT(req, { params }) {
   try {
     await connectDB();
 
-    const rawId = params?.id;
-    const id = Array.isArray(rawId) ? rawId[0] : rawId;
+    
+    const {id} = await params;
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
@@ -312,7 +310,7 @@ export async function DELETE(req, { params }) {
   try {
     await connectDB();
 
-    const id = params?.id;
+     const {id} = await params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });

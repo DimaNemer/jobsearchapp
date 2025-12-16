@@ -61,9 +61,10 @@ async function getJob(slug) {
   return data;
 }
 
-
 export default async function JobDetails({ params }) {
-  const job = await getJob(params.slug);
+  const { slug } = await params; // ✅ REQUIRED
+  const job = await getJob(slug);
+
 
   if (!job) {
     return <p className="p-8">Job not found</p>;

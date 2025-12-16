@@ -56,13 +56,15 @@ const [initialLoading, setInitialLoading] = useState(isEdit);
 
   async function loadJob() {
     try {
-      if (!jobId || jobId.length !== 24) {
+      if (!jobId) {
   alert("Invalid job id in URL");
   return;
 }
       const res = await fetch(`/api/jobs/${jobId}`, {
         credentials: "include",
       });
+
+      console.log("LOAD JOB RESPONSE:", res);
 
       const job = await res.json();
 
