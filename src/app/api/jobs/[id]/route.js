@@ -196,11 +196,58 @@
 //   }
 // }
 
+<<<<<<< HEAD
 // import { NextResponse } from "next/server";
 // import { connectDB } from "@/lib/mongodb";
 // import Job from "@/models/Job";
 // import jwt from "jsonwebtoken";
 // import mongoose from "mongoose";
+=======
+import { NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import Job from "@/models/Job";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+
+export async function GET(req, { params }) {
+  try {
+    await connectDB();
+
+    const {id} = await params;
+    // ✅ ADD: try slug first (DO NOT REMOVE ANYTHING BELOW)
+    if (id && !mongoose.Types.ObjectId.isValid(id)) {
+      const jobBySlug = await Job.findOne({ slug: id }).populate(
+        "employer",
+        "fullName email"
+      );
+
+      if (!jobBySlug) {
+        return NextResponse.json({ error: "Job not found" }, { status: 404 });
+      }
+
+      return NextResponse.json(jobBySlug);
+    }
+
+    // ⬇️ EXISTING CODE (UNCHANGED)
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+    }
+
+    const job = await Job.findById(id).populate("employer", "fullName email");
+    if (!job) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(job);
+  } catch (err) {
+    console.error("GET /api/jobs/[id] error:", err);
+    return NextResponse.json(
+      { error: "Failed to fetch job" },
+      { status: 500 }
+    );
+  }
+}
+>>>>>>> 614392d487a89ca998a2d7a8986a19b8ded0e028
 
 // export async function GET(req, { params }) {
 //   try {
@@ -359,6 +406,7 @@ export async function GET(req, context) {
   try {
     await connectDB();
 
+<<<<<<< HEAD
     // ✅ FIX: Properly await params
     const params = await context.params;
     const id = params.id;
@@ -412,6 +460,10 @@ export async function PUT(req, context) {
     const id = params.id;
 
     console.log("📝 PUT JOB - Received ID:", id);
+=======
+    
+    const {id} = await params;
+>>>>>>> 614392d487a89ca998a2d7a8986a19b8ded0e028
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
@@ -456,9 +508,13 @@ export async function DELETE(req, context) {
   try {
     await connectDB();
 
+<<<<<<< HEAD
     // ✅ FIX: Properly await params
     const params = await context.params;
     const id = params.id;
+=======
+     const {id} = await params;
+>>>>>>> 614392d487a89ca998a2d7a8986a19b8ded0e028
 
     console.log("🗑️ DELETE JOB - Received ID:", id);
 

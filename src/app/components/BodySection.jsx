@@ -20,10 +20,7 @@ export default function BodySection() {
         </h1>
 
         <p className="mt-3">APPLY NOW TO THE JOB OF THE FUTURE!</p>
-
-        <a href="/auth/login" className="bg-blue-600 px-5 py-2  rounded text-white">
-          Get Started
-        </a>
+      
       </div>
     </section>
   );

@@ -1,14 +1,320 @@
+
+
+// import { NextResponse } from "next/server";
+// import { connectDB } from "@/lib/mongodb";
+// import Job from "@/models/Job";
+// import mongoose from "mongoose";
+// import Company from "@/models/Company";
+
+
+// export async function GET(req, { params }) {
+//   try {
+//     await connectDB();
+
+//     const { id } = params;
+
+//     // Validate Mongo ObjectId
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json(
+//         { error: "Invalid job ID" },
+//         { status: 400 }
+//       );
+//     }
+
+//     const job = await Job.findById(id)
+//       .populate("company", "name location website")
+//       .populate("employer", "fullName email");
+
+//     if (!job) {
+//       return NextResponse.json(
+//         { error: "Job not found" },
+//         { status: 404 }
+//       );
+//     }
+
+//     return NextResponse.json({ job });
+//   } catch (err) {
+//     console.error(`GET /api/jobs/${params?.id} error:`, err);
+//     return NextResponse.json(
+//       { error: err.message || "Failed to fetch job" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+// import { NextResponse } from "next/server";
+// import { connectDB } from "@/lib/mongodb";
+// import Job from "@/models/Job";
+// import jwt from "jsonwebtoken";
+// import mongoose from "mongoose";
+
+// export async function GET(request, context) {
+//   try {
+//     await connectDB();
+
+//    const { id } = context.params;
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+//     }
+
+//     const job = await Job.findById(id).populate("employer", "fullName email");
+//     if (!job) {
+//       return NextResponse.json({ error: "Job not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json(job);
+//   } catch (err) {
+//     console.error(`GET /api/jobs/${params?.id} error:`, err);
+//     return NextResponse.json({ error: "Failed to fetch job" }, { status: 500 });
+//   }
+// }
+
+// export async function PUT(request, context) {
+//   try {
+//     await connectDB();
+
+//     const { id } = context.params;
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+//     }
+
+//     // ✅ auth from cookie
+//     const token = req.cookies.get("token")?.value;
+//     if (!token) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//     }
+
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     if (decoded.role !== "employer") {
+//       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+//     }
+
+//     // ✅ make sure employer owns this job
+//     const existing = await Job.findById(id);
+//     if (!existing) {
+//       return NextResponse.json({ error: "Job not found" }, { status: 404 });
+//     }
+
+//     if (String(existing.employer) !== String(decoded.id)) {
+//       return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+//     }
+
+//     const payload = await req.json();
+
+//     const updated = await Job.findByIdAndUpdate(
+//       id,
+//       { ...payload },
+//       { new: true }
+//     );
+
+//     return NextResponse.json({ message: "Job updated", job: updated });
+//   } catch (err) {
+//     console.error("PUT /api/jobs/[id] error:", err);
+//     return NextResponse.json(
+//       { error: err.message || "Server error" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+// import { NextResponse } from "next/server";
+// import { connectDB } from "@/lib/mongodb";
+// import Job from "@/models/Job";
+// import jwt from "jsonwebtoken";
+// import mongoose from "mongoose";
+
+// export async function GET(req, { params }) {
+//   try {
+//     await connectDB();
+
+//    const rawId = params?.id;
+// const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+// if (!id) {
+//   return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+// }
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+//     }
+
+//     const job = await Job.findById(id).populate("employer", "fullName email");
+//     if (!job) {
+//       return NextResponse.json({ error: "Job not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json(job);
+//   } catch (err) {
+//     console.error("GET /api/jobs/[id] error:", err);
+//     return NextResponse.json({ error: "Failed to fetch job" }, { status: 500 });
+//   }
+// }
+
+// export async function PUT(req, { params }) {
+//   try {
+//     await connectDB();
+
+//     const rawId = params.id;
+//     const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+//     if (!mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+//     }
+
+//     const token = req.cookies.get("token")?.value;
+//     if (!token) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//     }
+
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     if (decoded.role !== "employer") {
+//       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+//     }
+
+//     const existing = await Job.findById(id);
+//     if (!existing) {
+//       return NextResponse.json({ error: "Job not found" }, { status: 404 });
+//     }
+
+//     if (String(existing.employer) !== String(decoded.id)) {
+//       return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+//     }
+
+//     const payload = await req.json();
+
+//     const updated = await Job.findByIdAndUpdate(id, payload, { new: true });
+
+//     return NextResponse.json({ message: "Job updated", job: updated });
+//   } catch (err) {
+//     console.error("PUT /api/jobs/[id] error:", err);
+//     return NextResponse.json(
+//       { error: err.message || "Server error" },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Job from "@/models/Job";
-import User from "@/models/User";
 import jwt from "jsonwebtoken";
-import Company from "@/models/Company";
+import mongoose from "mongoose";
 
-
-export async function POST(req) {
+export async function GET(req, { params }) {
   try {
     await connectDB();
+
+    const {id} = await params;
+    // ✅ ADD: try slug first (DO NOT REMOVE ANYTHING BELOW)
+    if (id && !mongoose.Types.ObjectId.isValid(id)) {
+      const jobBySlug = await Job.findOne({ slug: id }).populate(
+        "employer",
+        "fullName email"
+      );
+
+      if (!jobBySlug) {
+        return NextResponse.json({ error: "Job not found" }, { status: 404 });
+      }
+
+      return NextResponse.json(jobBySlug);
+    }
+
+    // ⬇️ EXISTING CODE (UNCHANGED)
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+    }
+
+    const job = await Job.findById(id).populate("employer", "fullName email");
+    if (!job) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(job);
+  } catch (err) {
+    console.error("GET /api/jobs/[id] error:", err);
+    return NextResponse.json(
+      { error: "Failed to fetch job" },
+      { status: 500 }
+    );
+  }
+}
+
+// export async function GET(req, { params }) {
+//   try {
+//     await connectDB();
+
+//     const rawId = params?.id;
+//     const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+//     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+//       return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+//     }
+
+//     const job = await Job.findById(id).populate("employer", "fullName email");
+//     if (!job) {
+//       return NextResponse.json({ error: "Job not found" }, { status: 404 });
+//     }
+
+//     return NextResponse.json(job);
+//   } catch (err) {
+//     console.error("GET /api/jobs/[id] error:", err);
+//     return NextResponse.json({ error: "Failed to fetch job" }, { status: 500 });
+//   }
+// }
+
+export async function PUT(req, { params }) {
+  try {
+    await connectDB();
+
+    
+    const {id} = await params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+    }
+
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role !== "employer") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const existing = await Job.findById(id);
+    if (!existing) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
+    if (String(existing.employer) !== String(decoded.id)) {
+      return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+    }
+
+    const payload = await req.json();
+    const updated = await Job.findByIdAndUpdate(id, payload, { new: true });
+
+    return NextResponse.json({ message: "Job updated", job: updated });
+  } catch (err) {
+    console.error("PUT /api/jobs/[id] error:", err);
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: 500 }
+    );
+  }
+}
+export async function DELETE(req, { params }) {
+  try {
+    await connectDB();
+
+     const {id} = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid job ID" }, { status: 400 });
+    }
 
     const token = req.cookies.get("token")?.value;
     if (!token) {
@@ -21,117 +327,23 @@ export async function POST(req) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const employer = await User.findById(decoded.id).populate("company");
-
-    if (!employer) {
-      return NextResponse.json({ error: "Employer not found" }, { status: 404 });
+    const job = await Job.findById(id);
+    if (!job) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
-    if (!employer.company) {
-      return NextResponse.json(
-        { error: "Employer has no company" },
-        { status: 400 }
-      );
+    if (String(job.employer) !== String(decoded.id)) {
+      return NextResponse.json({ error: "Not allowed" }, { status: 403 });
     }
 
-    const data = await req.json();
+    await Job.deleteOne({ _id: id });
 
-    const job = await Job.create({
-      ...data,
-      employer: employer._id,
-      company: employer.company._id,
-      status: "active", // ✅ ensure status
-    });
-
-    return NextResponse.json({ message: "Job created", job }, { status: 201 });
+    return NextResponse.json({ message: "Job deleted successfully" });
   } catch (err) {
-    console.error("POST /api/jobs error:", err);
+    console.error("DELETE /api/jobs/[id] error:", err);
     return NextResponse.json(
       { error: err.message || "Server error" },
       { status: 500 }
     );
   }
 }
-
-export async function GET(req) {
-  try {
-    await connectDB();
-
-    const { searchParams } = new URL(req.url);
-    const mine = searchParams.get("mine");
-
-    if (mine === "true") {
-      const token = req.cookies.get("token")?.value;
-      if (!token) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      if (decoded.role !== "employer") {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-      }
-
-      const jobs = await Job.find({ employer: decoded.id })
-        .populate("company", "name location")
-        .sort({ createdAt: -1 });
-
-      return NextResponse.json({ jobs });
-    }
-
-    const jobs = await Job.find({ status: "active" })
-      .populate("company", "name location")
-      .sort({ createdAt: -1 });
-
-    return NextResponse.json({ jobs });
-  } catch (err) {
-    console.error("GET /api/jobs error:", err);
-    return NextResponse.json(
-      { error: err.message || "Failed to fetch jobs" },
-      { status: 500 }
-    );
-  }
-}
-
-
-
-
-// export async function GET(req) {
-//   try {
-//     await connectDB();
-
-//     const { searchParams } = new URL(req.url);
-//     const mine = searchParams.get("mine");
-
-//     if (mine === "true") {
-//       const token = req.cookies.get("token")?.value;
-//       if (!token) {
-//         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-//       }
-
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-//       if (decoded.role !== "employer") {
-//         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-//       }
-
-//       const jobs = await Job.find({ employer: decoded.id })
-//         .populate("company", "name location")
-//         .sort({ createdAt: -1 });
-
-//       return NextResponse.json({ jobs });
-//     }
-
-//     const jobs = await Job.find({ status: "active" })
-//       .populate("company", "name location")
-//       .sort({ createdAt: -1 });
-
-//     return NextResponse.json({ jobs });
-//   } catch (err) {
-//     console.error("GET /api/jobs error:", err);
-//     return NextResponse.json(
-//       { error: err.message || "Failed to fetch jobs" },
-//       { status: 500 }
-//     );
-//   }
-// }

@@ -40,9 +40,67 @@
 
 //   const logoPreview = useMemo(() => form.logo || "", [form.logo]);
 
+<<<<<<< HEAD
 //   function setField(key, value) {
 //     setForm((prev) => ({ ...prev, [key]: value }));
 //   }
+=======
+  function setField(key, value) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function parseBullets(text) {
+    return text
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+  }
+
+  useEffect(() => {
+  if (!isEdit) return;
+
+  async function loadJob() {
+    try {
+      if (!jobId) {
+  alert("Invalid job id in URL");
+  return;
+}
+      const res = await fetch(`/api/jobs/${jobId}`, {
+        credentials: "include",
+      });
+
+      console.log("LOAD JOB RESPONSE:", res);
+
+      const job = await res.json();
+
+      if (!res.ok) {
+        alert(job.error || "Failed to load job");
+        return;
+      }
+
+      setForm({
+        title: job.title || "",
+        location: job.location || "",
+        employmentType: job.employmentType || "Full-time",
+        experienceLevel: job.experienceLevel || "Any",
+        categories: (job.categories || []).join(", "),
+        salary: job.salary || "",
+        description: job.description || "",
+        responsibilitiesText: (job.responsibilities || []).join("\n"),
+        requirementsText: (job.requirements || []).join("\n"),
+        logo: job.logo || "",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Could not load job");
+    } finally {
+      setInitialLoading(false);
+    }
+  }
+
+  loadJob();
+}, [isEdit, jobId]);
+>>>>>>> 614392d487a89ca998a2d7a8986a19b8ded0e028
 
 //   function parseBullets(text) {
 //     return text
