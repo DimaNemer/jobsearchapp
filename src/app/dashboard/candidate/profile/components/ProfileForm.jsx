@@ -424,13 +424,6 @@ export default function ProfileForm() {
           className="border p-3 rounded-lg"
         />
 
-        <input
-          name="position"
-          value={form.position}
-          onChange={handleChange}
-          placeholder="Position"
-          className="border p-3 rounded-lg"
-        />
 
         <input
           name="district"
@@ -445,9 +438,16 @@ export default function ProfileForm() {
           value={form.address}
           onChange={handleChange}
           placeholder="Address"
-          className="border p-3 rounded-lg col-span-2"
+          className="border p-3 rounded-lg"
         />
 
+   <input
+          name="GitHub"
+          value={form.GitHub}
+          onChange={handleChange}
+          placeholder="GitHub"
+          className="border p-3 rounded-lg col-span-2"
+        />
         <input
           name="linkedin"
           value={form.linkedin}

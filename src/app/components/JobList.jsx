@@ -25,7 +25,8 @@ export default function JobList() {
 
   function handleSeeMore() {
     const token = localStorage.getItem("token");
-    router.push(token ? "/jobs" : "/auth/signup");
+    // router.push(token ? "/jobs" : "/auth/signup");
+     router.push("jobs");
   }
 
   return (
