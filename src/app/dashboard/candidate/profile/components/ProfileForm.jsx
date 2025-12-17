@@ -249,7 +249,7 @@ export default function ProfileForm() {
       phone: "",
       country: "",
       nationality: "",
-      position: "",
+      github: "",
       district: "",
       address: "",
       linkedin: "",
@@ -264,7 +264,7 @@ export default function ProfileForm() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const res = await fetch("/api/employer/profile", {
+        const res = await fetch("/api/candidate/profile", {
           credentials: "include",
         });
 
@@ -310,7 +310,7 @@ export default function ProfileForm() {
   ================================= */
   async function saveProfile() {
     try {
-      const res = await fetch("/api/employer/profile", {
+      const res = await fetch("/api/candidate/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -438,16 +438,9 @@ export default function ProfileForm() {
           value={form.address}
           onChange={handleChange}
           placeholder="Address"
-          className="border p-3 rounded-lg"
-        />
-
-   <input
-          name="GitHub"
-          value={form.GitHub}
-          onChange={handleChange}
-          placeholder="GitHub"
           className="border p-3 rounded-lg col-span-2"
         />
+
         <input
           name="linkedin"
           value={form.linkedin}

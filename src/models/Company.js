@@ -5,7 +5,7 @@ const CompanySchema = new mongoose.Schema(
     name: { type: String, required: true },
     location: { type: String },
     website: { type: String },
-    logo: { type: String }, // base64 or URL (for later)
+    logo: { type: String },
 
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -16,5 +16,9 @@ const CompanySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Company ||
-  mongoose.model("Company", CompanySchema);
+// Prevent model recompilation errors
+delete mongoose.models.Company;
+
+const Company = mongoose.model("Company", CompanySchema);
+
+export default Company;

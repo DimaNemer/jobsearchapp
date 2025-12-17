@@ -1,7 +1,7 @@
 "use client";
 import ProfileForm from "./components/ProfileForm";
 
-export default function EmployerProfilePage() {
+export default function CnadidateProfilePage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Profile</h1>
