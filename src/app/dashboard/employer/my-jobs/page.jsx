@@ -192,11 +192,11 @@ export default function MyJobsPage() {
       {jobs.length === 0 ? (
         <p className="text-gray-600">You have not posted any jobs yet.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {jobs.map((job) => (
             <div
               key={job._id}
-              className="border rounded-lg p-5 bg-white hover:shadow-md transition"
+              className="border rounded-lg p-7 bg-white hover:shadow-md transition"
             >
               <div className="flex justify-between items-start">
                 <div>
