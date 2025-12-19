@@ -7,3 +7,9 @@
 //     </main>
 //   );
 // }
+
+import HiringCompanies from "@/app/components/HiringCompanies";
+
+export default function HiringCompanyPage() {
+  return <HiringCompanies />;
+}

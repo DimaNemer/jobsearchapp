@@ -29,7 +29,7 @@ export default function AdminDashboard() {
 
       if (!data.user || data.user.role !== "admin") {
         alert("Access denied. Admins only.");
-        router.push("/");
+        router.push("/auth/login");
         return;
       }
 
